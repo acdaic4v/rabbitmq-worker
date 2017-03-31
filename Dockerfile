@@ -1,6 +1,6 @@
 # Dockerfile acdaic4v/rabbitmq-worker
 FROM acdaic4v/ubuntu-perl-rabbitmq:v20170330
-MAINTAINER acdaic4v
+MAINTAINER acdaic4v <acdaic4v@sloervi.de>
 
 LABEL Description="Create Docker Image that acts as a RabbitMQ Worker" Vendor="acdaic4v" Version="1"
 
