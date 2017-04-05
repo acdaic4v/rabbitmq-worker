@@ -16,7 +16,5 @@ RUN chmod u+x /usr/local/bin/rabbitmq-worker/rabbitmq-worker.pl
 VOLUME /usr/local/etc/rabbitmq-worker/rabbitmq-worker.yml
 # Your Script to run
 VOLUME /usr/local/bin/worker.pl
-# As long as I am developing
-VOLUME /workdir/rabbitmq-worker.pl
-ENTRYPOINT /workdir/rabbitmq-worker.pl
-# ENTRYPOINT /usr/local/bin/rabbitmq-worker/rabbitmq-worker.pl
+# Worker included in this Image / Container
+ENTRYPOINT /usr/local/bin/rabbitmq-worker/rabbitmq-worker.pl
