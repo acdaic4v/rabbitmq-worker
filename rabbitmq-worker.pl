@@ -4,66 +4,90 @@
 # This Scripts does the magic
 # acdaiv4v 31.03.2017
 #
-# Der einzulesende Dateiname ist fest: Wird über das Docker- Startscript vergeben
-#
-# Benoetigte Eintraege:
-#   - redishash
-#   - rediskey
 
 use strict;
 use warnings;
-# use JSON;
-# use YAML::XS;
-# use Scalar::Util qw(looks_like_number);
 use Net::RabbitMQ;
 use     YAML qw( LoadFile);
 
+# Your YAML Configuration File
 my $yamlconfig="/usr/local/etc/rabbitmq-worker/rabbitmq-worker.yml";  # Configuration RabbitMQ Server
 
-# Load Configuration 
+# Load Configuration
 $yamlconfig = LoadFile($yamlconfig);
 
 # Default Connections
+# Fallback Values for your YAML Configuration
 my $mq_server = "localhost";
 my $mq_connection = "acdaic4v";
 my $mq_user = "guest";
 my $mq_password = "guest";
+my $mq_vhost = "/";
+my $mq_channel = 1;
+my $mq_exchange = 'acdaic4vexchange';
+my $mq_queuename = 'acdaic4vqueue';
+my $mq_routing_key = '';
 
+# Set the Values if defined in your YAML
 for my $eintrag (@$yamlconfig)
 {
-        if($eintrag->{id} eq "log4perl")
+        if($eintrag->{mq_server})
         {
-                $log4perl = $eintrag->{wert};
+                $mq_server = $eintrag->{mq_server};
         }
-        elsif($eintrag->{id} eq "mq_server")
+        elsif($eintrag->{mq_connection})
         {
-                $mq_server = $eintrag->{wert};
+                $mq_connection = $eintrag->{mq_connection};
         }
-        elsif($eintrag->{id} eq "mq_connection")
+        elsif($eintrag->{mq_user})
         {
-                $mq_connection = $eintrag->{wert};
+                $mq_user = $eintrag->{mq_user};
         }
-        elsif($eintrag->{id} eq "mq_user")
+        elsif($eintrag->{mq_password})
         {
-                $mq_user = $eintrag->{wert};
+                $mq_password = $eintrag->{mq_password};
         }
-        elsif($eintrag->{id} eq "mq_password")
+        elsif($eintrag->{mq_vhost})
         {
-                $mq_password = $eintrag->{wert};
+                $mq_vhost = $eintrag->{mq_vhost};
+        }
+        elsif($eintrag->{mq_channel})
+        {
+                $mq_channel = $eintrag->{mq_channel};
+        }
+        elsif($eintrag->{mq_exchange})
+        {
+                $mq_exchange = $eintrag->{mq_exchange};
+        }
+        elsif($eintrag->{mq_queuename})
+        {
+                $mq_queuename = $eintrag->{mq_queuename};
+        }
+        elsif($eintrag->{mq_routing_key})
+        {
+                $mq_routing_key = $eintrag->{mq_routing_key};
         }
 }
 
-
-# Initialisieren
 my ($log, $mq);
-# Logging aktivieren
-# Log::Log4perl->init($log4perl);
-# $log = Log::Log4perl->get_logger();
+$mq = Net::RabbitMQ->new;
 
-my $mq = Net::RabbitMQ->new();
-# $log->debug("RABBIT: ".$mq_server.":".$mq_port);
-$mq->connect($mq_server, { user => $mq_user, password => $mq_password });
-$mq->channel_open(1);
+$mq->connect($mq_server, { user => $mq_user, password => $mq_password, vhost => $mq_vhost })
+  or die "Can't connect to RabbitMQ\n";
+$mq->channel_open($mq_channel);
+$mq->exchange_declare($mq_channel, $mq_exchange);
+$mq->queue_declare($mq_channel, $mq_queuename, {
+    passive => 0,
+    durable => 1,
+    exclusive => 0,
+    auto_delete => 0
+  });
+$mq->queue_bind($mq_channel, $mq_queuename, $mq_exchange, $mq_routing_key);
+$mq->consume($mq_channel, $mq_queuename);
 
-# Magic soon follows 
-$mq->disconnect();
+while(1)
+{
+        my $rv = $mq->recv();
+        # Your Action: Do what you have to do with the body:
+        system("/usr/local/bin/worker.pl $rv->{body}");
+}
