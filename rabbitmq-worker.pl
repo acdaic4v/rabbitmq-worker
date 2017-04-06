@@ -89,5 +89,8 @@ while(1)
 {
         my $rv = $mq->recv();
         # Your Action: Do what you have to do with the body:
-        system("/usr/local/bin/worker.pl $rv->{body}");
+        my $rc = system("/usr/local/bin/worker.pl $rv->{body}");
+        open FILE, ">/opt/transfer/rabbitworker.txt" or die "Cannot open logfile";
+        print FILE "WORKER: $rc: $rv->{body}\n";
+        close FILE;
 }
