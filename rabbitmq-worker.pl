@@ -82,8 +82,11 @@ $mq->queue_declare($mq_channel, $mq_queuename, {
     exclusive => 0,
     auto_delete => 0
   });
+print "BIND: $mq_channel, $mq_queuename, $mq_exchange, $mq_routing_key\n";
 $mq->queue_bind($mq_channel, $mq_queuename, $mq_exchange, $mq_routing_key);
+print "CONSUME: $mq_channel, $mq_queuename\n";
 $mq->consume($mq_channel, $mq_queuename);
+print "Vor while\n";
 
 while(1)
 {
