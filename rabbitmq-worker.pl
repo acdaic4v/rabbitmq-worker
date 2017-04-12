@@ -88,7 +88,7 @@ $mq->consume($mq_channel, $mq_queuename);
 while(1)
 {
         my $rv = $mq->recv();
-        print "BODY: $rv->{body}\n");
+        print "BODY: $rv->{body}\n";
         # Your Action: Do what you have to do with the body:
         my $rc = system("/usr/local/bin/worker.pl $rv->{body}");
         print "RC: $rc\n";
