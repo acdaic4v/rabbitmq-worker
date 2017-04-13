@@ -6,7 +6,9 @@ LABEL Description="Create Docker Image that acts as a RabbitMQ Worker" Vendor="a
 
 # Get my scripts
 RUN cd /usr/local/bin && git clone https://github.com/acdaic4v/rabbitmq-worker.git rabbitmq-worker
-
+# Install rabbitmqctl to add users, change password 
+RUN apt-get update && apt-get install -y rabbitmqctl 
+  
 # Create User and group
 RUN groupadd -r rabbit && useradd -r -g rabbit rabbit
 RUN chown -R rabbit /usr/local/bin/rabbitmq-worker
