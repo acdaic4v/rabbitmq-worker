@@ -11,7 +11,6 @@ RUN cd /usr/local/bin && git clone https://github.com/acdaic4v/rabbitmq-worker.g
 RUN groupadd -r rabbit && useradd -r -g rabbit rabbit
 RUN chown -R rabbit /usr/local/bin/rabbitmq-worker
 RUN chmod u+x /usr/local/bin/rabbitmq-worker/rabbitmq-worker.pl
-
 USER rabbit
 
 # YAML File with Configuration
@@ -19,4 +18,4 @@ VOLUME /usr/local/etc/rabbitmq-worker/rabbitmq-worker.yml
 # Your Script to run
 VOLUME /usr/local/bin/worker.pl
 # Worker included in this Image / Container
-ENTRYPOINT /usr/local/bin/rabbitmq-worker/rabbitmq-worker.pl
+# ENTRYPOINT /usr/local/bin/rabbitmq-worker/rabbitmq-worker.pl
