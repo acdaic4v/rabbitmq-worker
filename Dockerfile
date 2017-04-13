@@ -12,6 +12,8 @@ RUN groupadd -r rabbit && useradd -r -g rabbit rabbit
 RUN chown -R rabbit /usr/local/bin/rabbitmq-worker
 RUN chmod u+x /usr/local/bin/rabbitmq-worker/rabbitmq-worker.pl
 
+USER rabbit
+
 # YAML File with Configuration
 VOLUME /usr/local/etc/rabbitmq-worker/rabbitmq-worker.yml
 # Your Script to run
