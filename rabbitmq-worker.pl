@@ -71,34 +71,22 @@ for my $eintrag (@$yamlconfig)
 my ($log, $mq);
 $mq = Net::RabbitMQ->new;
 
-print "CONNECT: $mq_server, { user => $mq_user, password => $mq_password, vhost => $mq_vhost }\n";
 $mq->connect($mq_server, { user => $mq_user, password => $mq_password, vhost => $mq_vhost })
   or die "Can't connect to RabbitMQ\n";
-  print "OPEN: $mq_channel \n";
 $mq->channel_open($mq_channel);
-print "EXCHANGE: $mq_channel, $mq_exchange\n";
 $mq->exchange_declare($mq_channel, $mq_exchange);
-print "DECLARE: $mq_channel, $mq_queuename\n";
 $mq->queue_declare($mq_channel, $mq_queuename, {
     passive => 0,
     durable => 1,
     exclusive => 0,
     auto_delete => 0
   });
-print "BIND: $mq_channel, $mq_queuename, $mq_exchange, $mq_routing_key\n";
 $mq->queue_bind($mq_channel, $mq_queuename, $mq_exchange, $mq_routing_key);
-print "CONSUME: $mq_channel, $mq_queuename\n";
 $mq->consume($mq_channel, $mq_queuename);
-print "Vor while\n";
 
 while(1)
 {
         my $rv = $mq->recv();
-        print "BODY: $rv->{body}\n";
         # Your Action: Do what you have to do with the body:
-        my $rc = system("/usr/local/bin/myworker/worker.pl $rv->{body}");
-        print "RC: $rc\n";
-        open FILE, ">/opt/transfer/rabbitworker.txt" or die "Cannot open logfile";
-        print FILE "WORKER: $rc: $rv->{body}\n";
-        close FILE;
+        my $rc = system("/usr/local/bin/myworker/worker.pl '$rv->{body}'");
 }
