@@ -20,4 +20,4 @@ VOLUME /usr/local/etc/rabbitmq-worker/
 # Your Script to run
 VOLUME /usr/local/bin/myworker/
 # Worker included in this Image / Container
-# ENTRYPOINT /usr/local/bin/rabbitmq-worker/rabbitmq-worker.pl
+ENTRYPOINT /usr/local/bin/rabbitmq-worker/rabbitmq-worker.pl
