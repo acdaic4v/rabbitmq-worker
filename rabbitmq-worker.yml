@@ -1,0 +1,10 @@
+# Example for the /usr/local/etc/rabbitmq-worker/rabitmq-worker.yml
+-
+   mq_server: localhost
+   mq_connection : "acdaic4v"
+   mq_user: guest
+   mq_password: guest
+   mq_vhost: /
+   mq_channel: 1
+   mq_exchange: acdaic4vexchange
+   mq_queuename: acdaic4vqueue
